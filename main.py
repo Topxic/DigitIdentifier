@@ -108,7 +108,7 @@ for batch in zip(image_batches, label_batches):
     print(f'\rTraining network: {i / len(image_batches) * 100:.3f}%', end='')
     i += 1
 print()
-network.save('network-sigmoid-784-32-32-32-10.pkl')
+network.save('network-sigmoid-784-16-16-10.pkl')
 
 # Calculate accuracy
 s = 0
