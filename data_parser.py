@@ -66,8 +66,6 @@ def random_transform(matrix, scale_range=(0.4, 1.3), rotation_range=(-45, 45), t
             if 0 <= x < rows and 0 <= y < cols:
                 output_matrix[r, c] = matrix[x, y]
 
-    # Add noise
-    output_matrix = output_matrix + noise * np.random.rand(rows, cols) * 255
     return output_matrix
 
 
