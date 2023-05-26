@@ -1,7 +1,37 @@
 import pygame
 import numpy as np
+from activation import *
+from cost import *
+from layer import *
+from mnist import *
+from training import *
 
-from network import Network
+# Create network training data and train
+trainingData = parseTrainingData()
+scaleRange=(0.2, 1.1)
+rotationRange=(-45, 45)
+translationRange=(-5, 5)
+noiseRange=(0, 0.8)
+transformedTrainingData = []
+counter = 1
+for sample in trainingData[:1000]:
+    for _ in range(1):
+        scale = np.random.uniform(scaleRange[0], scaleRange[1])
+        rotation = np.random.uniform(rotationRange[0], rotationRange[1])
+        translation = np.random.uniform(translationRange[0], translationRange[1], size=2)
+        noise = np.random.uniform(noiseRange[0], noiseRange[1])
+        transformedImage = sample.transform(scale, rotation, translation, noise)
+        transformedTrainingData += [MNISTSample(transformedImage, sample.label)]
+    print(f'\rGenerating data: {counter / len(trainingData[:1000]) * 100:.3f}%', end='')
+    counter += 1
+trainingData += transformedTrainingData
+testData = parseTestData()
+
+network = [
+    Layer(784, 10, SigmoidActivation)
+]
+backpropagation(network, trainingData, testData, 0.01, 1, 3, MeanSquareCost)
+
 
 # Configuration
 scale = 10
@@ -13,7 +43,6 @@ white = np.array([255, 255, 255])
 red = np.array([255, 0, 0])
 black = np.array([0, 0, 0])
 
-network = Network('network-sigmoid-784-100-10.pkl', 'softmax', 'cross_entropy')
 result = np.zeros(10)
 
 # Create GUI
@@ -64,8 +93,11 @@ while running:
             idx = int(cell[1]), int(cell[0])
             val = canvas[idx]
             val += np.exp(-distance + (0.6 * scale))
-            canvas[idx] = max(min(val, 1), 0)        
-        result = network.eval(canvas.flatten())
+            canvas[idx] = max(min(val, 1), 0)   
+        x = canvas.flatten() 
+        for layer in network:
+            x = layer.forward(x)
+        result = x
 
     # Draw canvas on screen
     screen.fill(white)
