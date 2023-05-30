@@ -227,7 +227,7 @@ def plotRandomTransformations():
 
 
 def mnist2file(transformationsPerSample):
-    if os.path.isfile(FILE_NAME): 
+    if os.path.exists(FILE_NAME): 
         return
     
     data = parseTrainingData() + parseTestData()

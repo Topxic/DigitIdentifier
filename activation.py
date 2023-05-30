@@ -8,6 +8,9 @@ class Activation:
     def derivative(signal: np.ndarray) -> np.ndarray:
         pass
 
+    def getName() -> str:
+        pass
+
 
 class SigmoidActivation(Activation):
     def function(signal: np.ndarray) -> np.ndarray:
@@ -18,6 +21,9 @@ class SigmoidActivation(Activation):
         signal = np.clip(signal, -500, 500)
         s = SigmoidActivation.function(signal)
         return s * (1 - s)
+    
+    def getName() -> str:
+        return 'sigmoid'
 
 
 class SoftmaxActivation(Activation):
@@ -35,6 +41,9 @@ class SoftmaxActivation(Activation):
             denom = np.sign(denom) * 1.e-16
         return (exp * expSum - exp ** 2) / denom
     
+    def getName() -> str:
+        return 'softmax'
+    
 
 class ReLUActivation(Activation):
     def function(signal: np.ndarray) -> np.ndarray:
@@ -49,3 +58,15 @@ class ReLUActivation(Activation):
                 result[i] = 1
         return result
     
+    def getName() -> str:
+        return 'relu'
+    
+
+def fromName(name: str) -> Activation:
+    if name == 'sigmoid':
+        return SigmoidActivation
+    if name == 'softmax':
+        return SoftmaxActivation
+    if name == 'relu':
+        return ReLUActivation
+    raise ValueError("Activation function {name} doesn't exist")

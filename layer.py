@@ -1,5 +1,5 @@
 import numpy as np
-
+import pickle as pk
 from activation import *
 from mnist import *
 
@@ -14,11 +14,14 @@ class Layer:
         self.prevBiasGradient = np.zeros(shape=(numOutputNodes))
         self.prevWeightGradient = np.zeros(shape=(numOutputNodes, numInputNodes))
 
-    def setWeightsAndBiase(self, weights: np.ndarray, bias: np.ndarray):
-        assert self.weights.shape == weights.shape
-        assert self.bias.shape == bias.shape
+    def setFrom(self, weights: np.ndarray, bias: np.ndarray, activation: Activation):
         self.weights = weights
         self.bias = bias
+        self.activation = activation
+        self.biasGradient = np.zeros(shape=bias.shape)
+        self.weightGradient = np.zeros(shape=weights.shape)
+        self.prevBiasGradient = np.zeros(shape=bias.shape)
+        self.prevWeightGradient = np.zeros(shape=weights.shape)
 
     def forward(self, input: np.ndarray):
         self.nodeValues = self.weights @ input + self.bias
@@ -47,3 +50,30 @@ class Layer:
         self.prevWeightGradient = np.copy(self.weightGradient) 
         self.biasGradient.fill(0)
         self.weightGradient.fill(0)
+
+
+def saveNetwork(filePath: str, layers: list[Layer]):
+    weights = []
+    biases = []
+    activations = []
+    for layer in layers:
+        weights += [layer.weights]
+        biases += [layer.bias]
+        activations += [layer.activation.getName()]
+    with open(filePath, 'wb') as file:
+        pk.dump(weights, file)
+        pk.dump(biases, file)
+        pk.dump(activations, file)
+
+    
+def fromFile(filePath: str) -> list[Layer]:
+    with open(filePath, 'rb') as file:
+        weights = pk.load(file)
+        biases = pk.load(file)
+        activations = pk.load(file)
+    
+    layers = [Layer(1, 1, SigmoidActivation) for _ in range(len(weights))]
+    for l, w, b, a in zip(layers, weights, biases, activations):
+        l.setFrom(w, b, fromName(a))
+    return layers
+

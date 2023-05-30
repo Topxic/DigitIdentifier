@@ -6,17 +6,30 @@ from layer import *
 from mnist import *
 from training import *
 
+# Deep neural network configuration
+TRANSFOMRATIONS_PER_SAMPLE = 10
+NETWORK_FILE_PATH = 'mnist-identifier-network.pkl'
+LEARNING_RATE = 0.01
+BATCH_SIZE = 32
+EPOCHS = 3
+MOMENTUM = 0.9
 
-# Generate training data
-mnist2file(10)
+# Generate training and test data
+mnist2file(TRANSFOMRATIONS_PER_SAMPLE)
 testData = parseTestData()
-# Create and train network
-network = [
-    Layer(784, 200, ReLUActivation),
-    Layer(200, 10, SoftmaxActivation)
-]
-backpropagation(network, file2mnist, testData, 0.01, 32, 3, MeanSquareCost, 0.9)
-result = np.zeros(10)
+
+# Create, train and save network
+if not os.path.exists(NETWORK_FILE_PATH): 
+    network = [
+        Layer(784, 200, ReLUActivation),
+        Layer(200, 10, SoftmaxActivation)
+    ]
+    print(f'Start training network {NETWORK_FILE_PATH}')
+    backpropagation(network, file2mnist, testData, LEARNING_RATE, BATCH_SIZE, EPOCHS, MeanSquareCost, MOMENTUM)
+    saveNetwork(NETWORK_FILE_PATH, network)
+else:
+    print(f'Loading network from file {NETWORK_FILE_PATH}')
+    network = fromFile(NETWORK_FILE_PATH)
 
 # Configuration
 scale = 10
@@ -37,6 +50,8 @@ clock = pygame.time.Clock()
 
 running = True
 drawing = False
+result = np.zeros(10)
+
 while running:
     for event in pygame.event.get():
 
