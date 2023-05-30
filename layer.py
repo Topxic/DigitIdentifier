@@ -6,11 +6,13 @@ from mnist import *
 
 class Layer:
     def __init__(self, numInputNodes: int, numOutputNodes: int, activation: Activation):
-        self.weights = np.random.rand(numOutputNodes, numInputNodes) - 0.5
-        self.bias = np.random.rand(numOutputNodes) - 0.5
+        self.weights = np.random.randn(numOutputNodes, numInputNodes) / np.sqrt(numInputNodes)
+        self.bias = np.zeros(numOutputNodes)
         self.activation = activation
         self.biasGradient = np.zeros(shape=(numOutputNodes))
         self.weightGradient = np.zeros(shape=(numOutputNodes, numInputNodes))
+        self.prevBiasGradient = np.zeros(shape=(numOutputNodes))
+        self.prevWeightGradient = np.zeros(shape=(numOutputNodes, numInputNodes))
 
     def setWeightsAndBiase(self, weights: np.ndarray, bias: np.ndarray):
         assert self.weights.shape == weights.shape
@@ -36,9 +38,12 @@ class Layer:
         self.weightGradient += np.outer(delta, prevLayerActivation)
         return delta
 
-    def applyGradient(self, learningRate, batchSize):
-        learningFactor = learningRate / batchSize
-        self.bias += learningFactor * self.biasGradient
-        self.weights += learningFactor * self.weightGradient
+    def applyGradient(self, learningRate, batchSize, momentum):
+        self.biasGradient /= batchSize
+        self.weightGradient /= batchSize
+        self.bias += (1 - momentum) * learningRate * self.biasGradient + momentum * self.prevBiasGradient
+        self.weights += (1 - momentum) * learningRate * self.weightGradient + momentum * self.prevWeightGradient
+        self.prevBiasGradient = np.copy(self.biasGradient) 
+        self.prevWeightGradient = np.copy(self.weightGradient) 
         self.biasGradient.fill(0)
         self.weightGradient.fill(0)

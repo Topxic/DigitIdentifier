@@ -6,44 +6,26 @@ from layer import *
 from mnist import *
 from training import *
 
-# Create network training data and train
-trainingData = parseTrainingData()
-scaleRange=(0.2, 1.1)
-rotationRange=(-45, 45)
-translationRange=(-5, 5)
-noiseRange=(0, 0.8)
-transformedTrainingData = []
-counter = 1
-for sample in trainingData[:1000]:
-    for _ in range(1):
-        scale = np.random.uniform(scaleRange[0], scaleRange[1])
-        rotation = np.random.uniform(rotationRange[0], rotationRange[1])
-        translation = np.random.uniform(translationRange[0], translationRange[1], size=2)
-        noise = np.random.uniform(noiseRange[0], noiseRange[1])
-        transformedImage = sample.transform(scale, rotation, translation, noise)
-        transformedTrainingData += [MNISTSample(transformedImage, sample.label)]
-    print(f'\rGenerating data: {counter / len(trainingData[:1000]) * 100:.3f}%', end='')
-    counter += 1
-trainingData += transformedTrainingData
+
+# Generate training data
+mnist2file(10)
 testData = parseTestData()
-
+# Create and train network
 network = [
-    Layer(784, 10, SigmoidActivation)
+    Layer(784, 200, ReLUActivation),
+    Layer(200, 10, SoftmaxActivation)
 ]
-backpropagation(network, trainingData, testData, 0.01, 1, 3, MeanSquareCost)
-
+backpropagation(network, file2mnist, testData, 0.01, 32, 3, MeanSquareCost, 0.9)
+result = np.zeros(10)
 
 # Configuration
 scale = 10
 size = np.array([28, 28])
 window_size = np.array([scale * 28 + 170, scale * 28])
 canvas = np.zeros(size)
-
 white = np.array([255, 255, 255])
 red = np.array([255, 0, 0])
 black = np.array([0, 0, 0])
-
-result = np.zeros(10)
 
 # Create GUI
 pygame.init()

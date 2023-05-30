@@ -4,7 +4,7 @@ class Cost:
     def function(expected: np.ndarray, actual: np.ndarray) -> float:
         pass
 
-    def derivative(expected: np.ndarray, actual: np.ndarray) -> float:
+    def derivative(expected: np.ndarray, actual: np.ndarray) -> np.ndarray:
         pass
 
 
@@ -14,6 +14,6 @@ class MeanSquareCost(Cost):
         return np.sum(np.power(actual - expected, 2)) / len(actual)
         
 
-    def derivative(expected: np.ndarray, actual: np.ndarray) -> float:
+    def derivative(expected: np.ndarray, actual: np.ndarray) -> np.ndarray:
         assert len(actual) == len(expected)
         return expected - actual

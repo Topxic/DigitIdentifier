@@ -7,14 +7,12 @@ from mnist import *
 from layer import Layer
 
 
-def backpropagation(layers: list[Layer], trainingData, testData, learningRate, batchSize, epochs, costFunction):
-    numTrainingData = len(trainingData)
-    numBatches = numTrainingData // batchSize
-    batches = [trainingData[x*batchSize:x*batchSize+batchSize] for x in range(numBatches)]
+def backpropagation(layers: list[Layer], trainingDataGenerator, testData: list[MNISTSample], 
+                    learningRate: float, batchSize: int, epochs: int, costFunction: Cost, momentum: float):
 
     for epoch in range(1, epochs + 1):
-        counter = 1
-        for batch in batches:
+        counter = 0
+        for batch, progress in trainingDataGenerator(batchSize):
             averageBatchError = 0
             # Perform backpropagation
             for sample in batch:
@@ -37,12 +35,12 @@ def backpropagation(layers: list[Layer], trainingData, testData, learningRate, b
 
                 averageBatchError += costFunction.function(expected, activations[-1])
             
-            # Apply gradient and print statistics
+            # Apply gradient
             for layer in layers:
-                layer.applyGradient(learningRate, batchSize)
+                layer.applyGradient(learningRate, batchSize, momentum)
             averageBatchError /= len(batch)
-            print(f'\rEpoch: {epoch}: {counter / numBatches * 100:.3f}%, average cost: {averageBatchError:.6f}', end='')
-            counter += 1
+            counter += len(batch)
+            print(f'\rEpoch: {epoch} - {progress * 100:.3f}% average loss: {averageBatchError:.6f}', end='')
 
     # Evaluate network accuracy
     correct = 0
@@ -53,3 +51,4 @@ def backpropagation(layers: list[Layer], trainingData, testData, learningRate, b
         if np.argmax(x) == sample.label:
             correct += 1
     print(f'\nNetwork accuracy: {correct / len(testData) * 100:.3f}%')
+
