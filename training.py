@@ -1,8 +1,7 @@
 
 import numpy as np
-from activation import *
-from cost import *
-from mnist import *
+from cost import Cost
+from mnist import MNISTSample
 
 from layer import Layer
 

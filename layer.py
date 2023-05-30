@@ -1,7 +1,6 @@
 import numpy as np
 import pickle as pk
-from activation import *
-from mnist import *
+from activation import Activation, SigmoidActivation, fromName
 
 
 class Layer:
