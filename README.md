@@ -4,7 +4,7 @@ The network is trained by backpropagation. In the current setting it is trained 
 Furhtermore, the dataset is scaled, translated, rotated and noised randomly in order to provide a network that is capable of recognizing user drawn digits. 
 This implementation could also be used for other 2d canvas recognition tasks, such as doodles or letters. 
 
-![2023-06-14 16-21-39](https://github.com/Topxic/DigitIdentifier/assets/50781880/df236b7a-ff37-4fb9-be9d-839c68a13c98)
+![](DigitIdentifier.gif)
 
 
 ## Features
